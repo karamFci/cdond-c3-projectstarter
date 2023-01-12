@@ -186,7 +186,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
-      - destroy-enviroment:
+      - destroy-environment:
           workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
 
   # configure-infrastructure:
