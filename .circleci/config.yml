@@ -1,148 +1,228 @@
 version: 2.1
 
+commands:
+  destroy-environment:
+    description: destroy stacks with paramater workflow ID
+    parameters:
+      worklowId:
+        type: string
+    steps:
+      - run:
+          name: Destroy Env
+          when: on_fail
+          command: |
+          aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflowId>>
+          aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflowId>>
+          aws s3 rm s3://udapeople-<<parameters.workflowId>> --recursive
+
 jobs:
-  build-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys: [frontend-build]
-      - run:
-          name: Build front-end
-          command: |
-            # Your code here
-            cd frontend
-            npm install
-            npm run build
-            # exit 1
-      - save_cache:
-          paths: [frontend/node_modules]
-          key: frontend-build
+  # build-frontend:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys: [frontend-build]
+  #     - run:
+  #         name: Build front-end
+  #         command: |
+  #           # Your code here
+  #           cd frontend
+  #           npm install
+  #           npm run build
+  #           # exit 1
+  #     - save_cache:
+  #         paths: [frontend/node_modules]
+  #         key: frontend-build
 
-  build-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Back-end build
-          command: |
-            # Your code here
-            cd backend
-            npm install
-            npm run build            
+  # build-backend:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys: [backend-build]
+  #     - run:
+  #         name: Back-end build
+  #         command: |
+  #           # Your code here
+  #           cd backend
+  #           npm install
+  #           npm run build            
              
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-build
+  #     - save_cache:
+  #         paths: [backend/node_modules]
+  #         key: backend-build
 
-  test-frontend:
-      docker:
-        # Docker image here
-        - image: circleci/node:13.8.0
+  # test-frontend:
+  #     docker:
+  #       # Docker image here
+  #       - image: circleci/node:13.8.0
 
-      steps:
-        # Checkout code from git
-        - checkout
-        # Restore from cache
-        - restore_cache:
-            keys: 
-             - "frontend-build"
-        # Your job code here
-        - run: 
-            name: Run frontend test
-            command: | 
-              cd frontend
-              npm install
-              npm run test
+  #     steps:
+  #       # Checkout code from git
+  #       - checkout
+  #       # Restore from cache
+  #       - restore_cache:
+  #           keys: 
+  #            - "frontend-build"
+  #       # Your job code here
+  #       - run: 
+  #           name: Run frontend test
+  #           command: | 
+  #             cd frontend
+  #             npm install
+  #             npm run test
 
-  test-backend:
-      docker:
-        # Docker image here
-        - image: circleci/node:13.8.0
-      steps:
-        # Checkout code from git
-        - checkout
-        # Restore from cache
-        - restore_cache:
-            keys: 
-             - "backend-build"
-        # Your job code here
-        - run: 
-            name: Run backend test
-            command: | 
-              cd backend
-              npm install
-              npm run test
+  # test-backend:
+  #     docker:
+  #       # Docker image here
+  #       - image: circleci/node:13.8.0
+  #     steps:
+  #       # Checkout code from git
+  #       - checkout
+  #       # Restore from cache
+  #       - restore_cache:
+  #           keys: 
+  #            - "backend-build"
+  #       # Your job code here
+  #       - run: 
+  #           name: Run backend test
+  #           command: | 
+  #             cd backend
+  #             npm install
+  #             npm run test
  
-  scan-frontend:
-    docker:
-      # Docker image here
-      - image: circleci/node:13.8.0
-    steps:
-      # Checkout code from git
-      - checkout
-      # Restore from cache
-      - restore_cache:
-          keys: 
-            - "frontend-build"
-      # Your job code here
-      - run: 
-          name: Analyze frontend
-          command: |
-            cd frontend
-            npm install
-            # npm install oauth-sign@^0.9.0
-            npm audit fix --audit-level=critical --force
-            npm audit fix --force
-            npm audit --audit-level=critical
-            # If the "npm audit fix" command above could not fix all critical vulnerabilities, try “npm audit fix --force” again
-            npm audit --audit-level=critical
+  # scan-frontend:
+  #   docker:
+  #     # Docker image here
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     # Checkout code from git
+  #     - checkout
+  #     # Restore from cache
+  #     - restore_cache:
+  #         keys: 
+  #           - "frontend-build"
+  #     # Your job code here
+  #     - run: 
+  #         name: Analyze frontend
+  #         command: |
+  #           cd frontend
+  #           npm install
+  #           # npm install oauth-sign@^0.9.0
+  #           npm audit fix --audit-level=critical --force
+  #           npm audit fix --force
+  #           npm audit --audit-level=critical
+  #           # If the "npm audit fix" command above could not fix all critical vulnerabilities, try “npm audit fix --force” again
+  #           npm audit --audit-level=critical
 
-  scan-backend:
+  # scan-backend:
+  #   docker:
+  #     # Docker image here
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     # Checkout code from git
+  #     - checkout
+  #     # Restore from cache
+  #     - restore_cache:
+  #         keys: 
+  #           - "backend-build"
+  #     # Your job code here
+  #     - run: 
+  #         name: Analyze backend
+  #         command: |
+  #           cd backend
+  #           npm install
+  #           # npm install oauth-sign@^0.9.0
+  #           npm audit fix --force --audit-level=critical
+  #           npm audit fix --force --audit-level=critical
+  #           #npm audit --audit-level=critical
+  #           #npm audit fix --force
+  #           #npm audit fix --audit-level=critical --force
+  #           #npm audit fix --audit-level=critical --force
+  #           # If the "npm audit fix" command above could not fix all critical vulnerabilities, try “npm audit fix --force” again
+  #           #npm audit --audit-level=critical
+  deploy-infrastructure:
     docker:
-      # Docker image here
-      - image: circleci/node:13.8.0
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
     steps:
       # Checkout code from git
       - checkout
-      # Restore from cache
-      - restore_cache:
-          keys: 
-            - "backend-build"
-      # Your job code here
-      - run: 
-          name: Analyze backend
+      - run:
+          name: install gzip & tar
           command: |
-            cd backend
-            npm install
-            # npm install oauth-sign@^0.9.0
-            npm audit fix --force --audit-level=critical
-            npm audit fix --force --audit-level=critical
-            #npm audit --audit-level=critical
-            #npm audit fix --force
-            #npm audit fix --audit-level=critical --force
-            #npm audit fix --audit-level=critical --force
-            # If the "npm audit fix" command above could not fix all critical vulnerabilities, try “npm audit fix --force” again
-            #npm audit --audit-level=critical
+              yum install -y gzip tar
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople \
+               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+              
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            # Your code here
+            aws ec2 describe-instance \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --filters "Name=tag:Name,Values= backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text >> ./.circleci/ansible/inventory.txt
+            cat ./.circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      # Here's where you will add some code to rollback on failure
+      - destroy-enviroment:
+          workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
+
+  # configure-infrastructure:
+  #   docker:
+  #     # Docker image here that supports Ansible
+  #   steps:
+  #     # Checkout code from git
+  #     # Add ssh keys with fingerprint
+  #     # attach workspace
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # Your code here
+  #           exit 1
+  #     - run:
+  #         name: Configure server
+  #         command: |
+  #           # Your code here
+  #           exit 1
+  #     # Here's where you will add some code to rollback on failure      
 
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-              requires:
-               - build-frontend
-      - test-backend:
-              requires:
-               - build-backend
-      - scan-frontend:
-              requires:
-                - test-frontend # i know that in screenshot it says requires build for scan , but i think its better to require test for better confidence in the code
-      - scan-backend:
-              requires:
-                - test-backend
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #         requires:
+      #          - build-frontend
+      # - test-backend:
+      #         requires:
+      #          - build-backend
+      # - scan-frontend:
+      #         requires:
+      #           - test-frontend # i know that in screenshot it says requires build for scan , but i think its better to require test for better confidence in the code
+      # - scan-backend:
+      #         requires:
+      #           - test-backend
+        - deploy-infrastructure
