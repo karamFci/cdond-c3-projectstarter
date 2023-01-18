@@ -13,7 +13,7 @@
     name: pm2
     global: yes
 
-- name: "install ans start app"
+- name: install ans start app
   command: pm2 start main.js
   agrs: 
     chdir: ~/backend/dist
