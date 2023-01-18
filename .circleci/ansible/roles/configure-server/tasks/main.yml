@@ -16,7 +16,7 @@
 - name: "install ans start app"
   command: pm2 start main.js
   agrs: 
-    chdir: ~backend/dist
+    chdir: ~/backend/dist
   environment:
     ENVRIONMENT: production
     TYPEORM_CONNECTION: "{{ lookup('env', 'postgres')}}"  
