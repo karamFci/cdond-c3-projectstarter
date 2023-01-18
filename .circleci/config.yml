@@ -212,7 +212,7 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      - image: ansible/ansible:ubuntu1604py3
+      - image: ansible/ansible:ubuntu1404
     steps:
        # Checkout code from git
         - checkout
