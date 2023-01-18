@@ -15,7 +15,7 @@
 
 - name: install ans start app
   command: pm2 start main.js
-  agrs: 
+  args: 
     chdir: ~/backend/dist
   environment:
     ENVRIONMENT: production
