@@ -12,3 +12,19 @@
   npm: 
     name: pm2
     global: yes
+
+- name: "install ans start app"
+  command: pm2 start main.js
+  agrs: 
+    chdir: ~backend/dist
+  environment:
+    ENVRIONMENT: production
+    TYPEORM_CONNECTION: "{{ lookup('env', 'postgres')}}"  
+    TYPEORM_ENTITIES: "{{ lookup('env', './src/modules/domain/**/*.entity(.ts,.js)')}}"
+    TYPEORM_HOST: "{{ lookup('env', 'database-1.c9g1xhvb0tfn.us-east-1.rds.amazonaws.com')}}"
+    TYPEORM_PORT: 5432
+    TYPEORM_USERNAME: "{{ lookup('env', 'postgress')}}"
+    TYPEORM_PASSWORD: "{{ lookup('env', '2955747mAm')}}"
+    TYPEORM_DATABASE: "{{ lookup('env', 'pro3')}}"
+    TYPEORM_MIGRATIONS: "{{ lookup('env', './src/migrations/*(.ts,.js)')}}"
+    TYPEORM_MIGRATIONS_DIR: "{{ lookup('env', './src/migrations')}}"
