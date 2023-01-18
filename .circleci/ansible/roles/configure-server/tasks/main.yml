@@ -3,7 +3,10 @@
 - name: " add Node.js from Nodesource"
   become: true 
   shell: |
-    curl -sl https://deb.nodesource.com/setup_13.x | sudo  bash -
+    echo insecure > ~/.curlrc && \
+    echo 'Acquire::https::deb.nodesource.com::Verify-Peer "false";' > /etc/apt/apt.conf.d/80ssl-exceptions && \
+    echo 'Acquire::https::deb.nodesource.com::Verify-Host "false";' >> /etc/apt/apt.conf.d/80ssl-exceptions
+    curl -sl https://deb.nodesource.com/setup_13.x | sudo -E bash -
 
 - name: " install node.js 13"
   become: true
