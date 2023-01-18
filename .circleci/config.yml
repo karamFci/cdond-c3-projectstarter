@@ -15,6 +15,26 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflowId>>
             aws s3 rm s3://udapeople-<<parameters.workflowId>> --recursive
 
+  install_awscli:
+    description: install awscli
+    steps:
+      - run: 
+          name: install awscli
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+  install_ansible:
+    description: install ansible
+    steps:
+      - run:
+          name: install ansible
+          command: |
+             sudo apt update
+             sudo apt install software-properties-common
+             sudo add-apt-repository --yes --update ppa:ansible/ansible
+             sudo apt install ansible          
 jobs:
   # build-frontend:
   #   docker:
@@ -189,24 +209,29 @@ jobs:
       - destroy-environment:
           workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  # configure-infrastructure:
-  #   docker:
-  #     # Docker image here that supports Ansible
-  #   steps:
-  #     # Checkout code from git
-  #     # Add ssh keys with fingerprint
-  #     # attach workspace
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     # Here's where you will add some code to rollback on failure      
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      - image: cimg/base:stable
+    steps:
+       # Checkout code from git
+        - checkout
+        - add_ssh_keys:
+              fingerprints: ["9d:52:e3:97:ae:6e:a3:6c:5f:c0:b2:97:b8:4c:06:81"]
+        - attach_workspace:
+            at: ~/
+        - run: 
+            name: install dependencies
+            command: |
+              install_ansible
+              install_awscli
+        - run:
+           name: configure server
+           command: |
+              cd .circleci/ansible
+              ansible-playbook -i inventory.txt configure.server.yml    
+        - destroy-environment:
+            workflowId: ${CIRCLE_WORKFLOW_ID:0:7}  
 
 workflows:
   default:
@@ -226,3 +251,6 @@ workflows:
       #         requires:
       #           - test-backend
         - deploy-infrastructure
+        - configure-infrastructure:
+            requires: 
+              - deploy-infrastructure
