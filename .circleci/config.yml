@@ -35,8 +35,9 @@ commands:
              sudo apt install software-properties-common -y
 
              sudo apt-add-repository --yes ppa:ansible/ansible
-
-             sudo apt DPkg::Options::="--force-confnew" install ansible  -y   
+             apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+             apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
+             sudo apt install ansible  -y   
 jobs:
   # build-frontend:
   #   docker:
