@@ -33,7 +33,7 @@ commands:
           command: |
              sudo apt update
              sudo apt install software-properties-common -y
-             sudo add-apt-repository --yes --remove --update ppa:ansible/ansible
+             sudo add-apt-repository --yes --update ppa:ansible/ansible
              sudo apt install ansible  -y   
 jobs:
   # build-frontend:
@@ -212,21 +212,21 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      - image: python:3.7-alpine3.11
+      - image: cimg/base:stable
     steps:
        # Checkout code from git
         - checkout
-#        - install_ansible
-#        - install_awscli
+        - install_ansible
+        - install_awscli
         - add_ssh_keys:
               fingerprints: ["9d:52:e3:97:ae:6e:a3:6c:5f:c0:b2:97:b8:4c:06:81"]
         - attach_workspace:
             at: ~/
-        - run: 
-             name: install dependencies
-             command: |
-               apk add tar gzip ansible
-               pip3 install awscli
+        # - run: 
+            #  name: install dependencies
+            #  command: |
+            #    apk add tar gzip ansible
+            #    pip3 install awscli
         - run:
            name: configure server
            command: |
