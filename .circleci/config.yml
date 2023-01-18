@@ -36,7 +36,7 @@ commands:
 
              sudo apt-add-repository --yes ppa:ansible/ansible
 
-             sudo apt install ansible  -y   -Y
+             sudo apt DPkg::Options::="--force-confnew" install ansible  -y   
 jobs:
   # build-frontend:
   #   docker:
