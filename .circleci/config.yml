@@ -222,7 +222,7 @@ jobs:
               fingerprints: ["9d:52:e3:97:ae:6e:a3:6c:5f:c0:b2:97:b8:4c:06:81"]
         - attach_workspace:
             at: ~/
-         - run: 
+        - run: 
              name: install dependencies
              command: |
                apk add tar gzip ansible
