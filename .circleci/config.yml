@@ -35,6 +35,24 @@ commands:
              sudo apt install software-properties-common -y
              sudo add-apt-repository --yes --update ppa:ansible/ansible
              sudo apt install ansible  -y   
+  
+  revert-migration:
+    description: Revert the last migration
+    parameters:
+      workflowId:
+        type: string
+    steps:
+      - run: 
+          name: revert migration
+          when: on_fail
+          command: |
+            SUCCESS=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/migration_<<parameters.workflowId>>)
+            if (($SUCCESS == 1 ));
+            then
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
+            fi
 jobs:
   # build-frontend:
   #   docker:
@@ -234,7 +252,29 @@ jobs:
               ansible-playbook -i inventory.txt configure-server.yml    
         - destroy-environment:
             workflowId: ${CIRCLE_WORKFLOW_ID:0:7}  
-
+  run-migration:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - install_awscli
+      - run :
+          name: Run Migration
+          command: |
+            cd backend
+            npm install
+            npm run migration > migrations_dumb.txt
+      - run:
+          name: send migration status to kvdb.io
+          command: |
+            if grep -q "has been executed seccessfully." ~/project/backend/migrations_dumb.txt
+            then
+              curl https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORLFLOW_ID:0:7} -d '1'
+            fi
+      - destroy-environment:
+          workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migration:
+          workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
 workflows:
   default:
     jobs:
@@ -256,3 +296,6 @@ workflows:
         - configure-infrastructure:
             requires: 
               - deploy-infrastructure
+        - run-migration:
+            requires:
+              - configure-infrastructure
