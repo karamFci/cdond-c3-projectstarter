@@ -1,16 +1,12 @@
 ## Back-end server configuration playbook goes here.
 ---
-- name: " add Node.js from Nodesource"
+- name: " install nodejs 13"
   become: true 
   shell: |
-    curl -sl https://deb.nodesource.com/setup_13.x | sudo -E bash -
-
-- name: " install node.js 13"
-  become: true
-  apt:
-    name: ["nodejs"]
-    state: latest
-    update_cache: yes
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt install -y nodejs
+    sudo npm install --global n
+    sudo n 13.8.0
 
 - name: "install pm2 globally"
   npm: 
