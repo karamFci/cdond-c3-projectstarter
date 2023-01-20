@@ -257,13 +257,18 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - install_awscli
       - run :
           name: Run Migration
           command: |
             cd backend
+            cat .env
             npm install
-            npm run migrations > migrations_dumb.txt
+            npm i  
+            npm run migrations > ./backend/migrations_dumb.txt
+            cat ./backend/migrations_dumb.txt
       - run:
           name: send migration status to kvdb.io
           command: |
