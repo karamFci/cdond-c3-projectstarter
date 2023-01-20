@@ -53,6 +53,15 @@ commands:
               npm install
               npm run migration:revert
             fi
+
+  install_nodejs:
+    description: Install Node.js 13
+    steps:
+      - run:
+          name: Install Node.js 13
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs
 jobs:
   build-frontend:
     docker:
@@ -274,54 +283,103 @@ jobs:
             then
               curl https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORLFLOW_ID:0:7} -d '1'
             fi
-            
+
       - destroy-environment:
           workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migration:
           workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
-  # deploy-frontend:
-  #   docker:
-  #     # Docker image here that supports AWS CLI
-  #     image: amazon/aws-cli
-  #   steps:
-  #     # Checkout code from git
-  #     - checkout
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #           yum update -y
-  #           yum install -y tar gzip
-  #           yup install -y python3
-  #           curl -sl https://rpm.nodesource.com/setup_10.x | bash -
-  #           yum install -y nodejs
-  #           pip3 install ansible
-  #           pip3 install awscli
+ 
+  deploy-frontend:
+    docker:
+      # Docker image here that supports AWS CLI
+      image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            yum update -y
+            yum install -y tar gzip
+            yup install -y python3
+            curl -sl https://rpm.nodesource.com/setup_10.x | bash -
+            yum install -y nodejs
+            pip3 install ansible
+            pip3 install awscli
 
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           # your code here
-  #           export BACKEND_IP= (aws ec2 describe-instances \
-  #           --query "Reservations[*].Instances[*].PublicIpAddress" \
-  #           --filters "Name=tag:Name,Values= backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #           --output text)
-  #           export API_URL="http://${BACKEND_IP}:3030"
-  #           echo "API_URL = ${API_URL}"
-  #           echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-  #           cat frontend/.env
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           # your code here
-  #           cd frontend
-  #           npm install
-  #           npm run build
-  #           tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-  #           aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-  #     # Here's where you will add some code to rollback on failure      
-  #     - destroy-environment:
-  #         workflowId: ${CIRCLE_WORKFLOW_ID:0:7}                    
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+            export BACKEND_IP= (aws ec2 describe-instances \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --filters "Name=tag:Name,Values= backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            # your code here
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure      
+      - destroy-environment:
+          workflowId: ${CIRCLE_WORKFLOW_ID:0:7}   
+      - revert-migration:
+          workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
+
+deploy-backend:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_ansible
+      - install_awscli
+      - install_nodejs
+
+      - add_ssh_keys:
+          fingerprints: ["9d:52:e3:97:ae:6e:a3:6c:5f:c0:b2:97:b8:4c:06:81"]   
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [backend-build]  
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt-get install tar gzip -y
+            cd backend
+            npm install
+      - run:
+          name: Package Backend
+          command: |
+            cd backend
+            npm run build
+            tar -czf artifact.tar.gz dist/* package*
+            cd ..
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files      
+      - run:
+          name: Deploy backend
+          command: |
+            export TYPEORM_MIGRATIONS_DIR=./migrations
+            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+            export TYPEORM_MIGRATIONS=./migrations/*.ts
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment:
+          workflowId: ${CIRCLE_WORKFLOW_ID:0:7}   
+      - revert-migration:
+          workflowId: ${CIRCLE_WORKFLOW_ID:0:7}
+
 
 
 workflows:
@@ -348,3 +406,9 @@ workflows:
         - run-migration:
             requires:
               - configure-infrastructure
+        - deploy-frontend:
+            requires:
+              - run-migration
+        - deploy-backend:
+            requires:
+              - run-migration
