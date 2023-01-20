@@ -304,7 +304,7 @@ jobs:
             # your code here
             yum update -y
             yum install -y tar gzip
-            yup install -y python3
+            yum install -y python3
             curl -sl https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs
             pip3 install ansible
