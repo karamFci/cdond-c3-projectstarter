@@ -1,13 +1,13 @@
-NODE_ENV=production
-VERSION=1
-TYPEORM_CONNECTION=postgres
-TYPEORM_MIGRATIONS_DIR=./migrations
-TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-TYPEORM_MIGRATIONS=./migrations/*{.ts,.js}
+export NODE_ENV=production
+export VERSION=1
+export TYPEORM_CONNECTION=postgres
+export TYPEORM_MIGRATIONS_DIR=./migrations
+export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+export TYPEORM_MIGRATIONS=./migrations/*{.ts,.js}
 
 # Things you can change if you wish...
-TYPEORM_HOST=endpoint
-TYPEORM_PORT=RDS PORT
-TYPEORM_USERNAME=RDS USER
-TYPEORM_PASSWORD=RDS PASS
-TYPEORM_DATABASE=glee
+export TYPEORM_HOST=database-1.c9g1xhvb0tfn.us-east-1.rds.amazonaws.com
+export TYPEORM_PORT=5432
+export TYPEORM_USERNAME=postgress
+export TYPEORM_PASSWORD=2955747mAm
+export TYPEORM_DATABASE=pro3
