@@ -470,43 +470,105 @@ jobs:
             fi
 
 workflows:
-  default:
-    jobs:
+  udapeople:
+      jobs:
         - build-frontend
+            filters:
+              branches:
+                only:
+                  - master
+                  - dev-branch
         - build-backend
+            filters:
+              branches:
+                only:
+                  - master
+                  - dev-branch        
         - test-frontend:
-                requires:
-                - build-frontend
+            filters:
+              branches:
+                only:
+                  - master
+                  - dev-branch        
+            requires:
+              - build-frontend
         - test-backend:
-                requires:
-                - build-backend
+            filters:
+              branches:
+                only:
+                  - master
+                  - dev-branch        
+            requires:
+              - build-backend
         - scan-frontend:
-                requires:
-                  - test-frontend # i know that in screenshot it says requires build for scan , but i think its better to require test for better confidence in the code
+            filters:
+              branches:
+                only:
+                  - master
+                  - dev-branch        
+            requires:
+               - test-frontend # i know that in screenshot it says requires build for scan , but i think its better to require test for better confidence in the code
         - scan-backend:
-                requires:
-                  - test-backend
+            filters:
+              branches:
+                only:
+                  - master
+                  - dev-branch        
+            requires:
+                - test-backend
         - deploy-infrastructure
+            filters:
+              branches:
+                only:
+                  - master
         - configure-infrastructure:
+            filters:
+              branches:
+                only:
+                  - master        
             requires: 
               - deploy-infrastructure
         - run-migration:
+            filters:
+              branches:
+                only:
+                  - master        
             requires:
               - configure-infrastructure
         - deploy-frontend:
+            filters:
+              branches:
+                only:
+                  - master        
             requires:
               - run-migration
         - deploy-backend:
+            filters:
+              branches:
+                only:
+                  - master        
             requires:
               - run-migration
         - smoke-test:
+            filters:
+              branches:
+                only:
+                  - master        
             requires:
               - deploy-frontend
               - deploy-backend
         - cloudfront-update:
+            filters:
+              branches:
+                only:
+                  - master        
             requires:
               - smoke-test
         - cleanup:
+            filters:
+              branches:
+                only:
+                  - master        
             requires:
               - cloudfront-update
             
