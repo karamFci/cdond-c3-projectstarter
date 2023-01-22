@@ -472,13 +472,13 @@ jobs:
 workflows:
   udapeople:
       jobs:
-        - build-frontend
+        - build-frontend:
             filters:
               branches:
                 only:
                   - master
                   - dev-branch
-        - build-backend
+        - build-backend:
             filters:
               branches:
                 only:
@@ -516,7 +516,7 @@ workflows:
                   - dev-branch        
             requires:
                 - test-backend
-        - deploy-infrastructure
+        - deploy-infrastructure:
             filters:
               branches:
                 only:
