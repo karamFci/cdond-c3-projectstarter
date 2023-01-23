@@ -18,6 +18,24 @@
     src: node_exporter.service
     dest: /etc/systemd/system/
 
+- name: "modify node exporter config"
+  ansible.builtin.blockinfile:
+    path: /etc/systemd/system/node_exporter.service
+    block: |
+      [Unit]
+      Description=Prometheus Node Exporter Service
+      After=network.target
+
+      [Service]
+      User=node_exporter
+      Group=node_exporter
+      Type=simple
+      ExecStart=/usr/local/bin/node_exporter
+
+      [Install]
+      WantedBy=multi-user.target
+
+
 - name: "enable node_exporter service"
   become: true
   systemd:
