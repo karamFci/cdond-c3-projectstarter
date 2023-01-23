@@ -1,7 +1,6 @@
 - name: Add the user 
   ansible.builtin.user:
     name: node_exporter
-    group: node_exporter
 
 - name: "install node exporter."
   unarchive:
